@@ -94,7 +94,7 @@ export async function applyFormResponseStatusFilter(app: Page, statusLabel: stri
 export async function createPendingFormPromptLight(
   app: Page,
   namePrefix = 'form-prompt'
-): Promise<{ workflowId: string; promptName: string }> {
+): Promise<{ workflowId: string; promptName: string; executionId: string; formPromptId: string }> {
   const workflowName = buildUniqueName('e2e-form-response')
   const promptName = buildUniqueName(namePrefix)
   const hasTemporal = !!process.env['SYNTARA_E2E_HAS_TEMPORAL_WORKER']
@@ -143,5 +143,14 @@ export async function createPendingFormPromptLight(
     await pollFormPromptVisible(app, promptName, { timeout: 15_000 })
   }
 
-  return { workflowId, promptName }
+  let formPromptId = ''
+  await expect(async () => {
+    const resp = await apiRequest(app, 'get', `/form_prompts?execution_id=${executionId}&status=pending&limit=100`)
+    const body = (await resp.json()) as { resources?: Array<{ id: string; name: string }> }
+    const match = body.resources?.find((row) => row.name === promptName)
+    expect(match?.id).toBeTruthy()
+    formPromptId = match?.id ?? ''
+  }).toPass({ timeout: 15_000 })
+
+  return { workflowId, promptName, executionId, formPromptId }
 }

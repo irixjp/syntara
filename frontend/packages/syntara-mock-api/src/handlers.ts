@@ -23,7 +23,12 @@ import { executions } from './resources/executions'
 import { getExecutionDetail } from './resources/executionDetails'
 import { activityExecutions } from './resources/activityExecutions'
 import { approvals } from './resources/approvals'
-import { alignPendingFormPromptClock, formPromptToListRead, formPrompts } from './resources/formPrompts'
+import {
+  alignPendingFormPromptClock,
+  formPromptToListRead,
+  formPrompts,
+  restoreStaticFormPromptSeeds,
+} from './resources/formPrompts'
 import { settings, settingsCategories } from './resources/settings'
 import { revocationState } from './resources/revocation'
 import { identityProviders, type IdentityProvider } from './resources/identityProviders'
@@ -2201,6 +2206,7 @@ export const handlers = [
   }),
 
   http.get('/api/v1/form_prompts', ({ request }) => {
+    restoreStaticFormPromptSeeds()
     const url = new URL(request.url)
     const status = url.searchParams.get('status')
     const statusIn = url.searchParams.get('status[in]')
@@ -2290,6 +2296,7 @@ export const handlers = [
   }),
 
   http.get('/api/v1/form_prompts/:formPromptId', (request) => {
+    restoreStaticFormPromptSeeds()
     const formPromptId = request.params.formPromptId
     const body = formPrompts.find((p) => p.id === formPromptId)
     if (!body) {

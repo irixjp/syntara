@@ -167,3 +167,16 @@ export const formPrompts: FormPromptRead[] = [
     }
   }),
 ]
+
+/** Frozen copy of bundled seed rows — restored on read so E2E can reuse one mock process. */
+const staticFormPromptSeeds: FormPromptRead[] = structuredClone(formPrompts)
+
+/** Reset bundled form prompt rows after in-memory submits (E2E mock reuse). */
+export function restoreStaticFormPromptSeeds(): void {
+  for (const seed of staticFormPromptSeeds) {
+    const index = formPrompts.findIndex((prompt) => prompt.id === seed.id)
+    if (index >= 0) {
+      formPrompts[index] = structuredClone(seed)
+    }
+  }
+}
