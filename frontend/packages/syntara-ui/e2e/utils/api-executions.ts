@@ -43,3 +43,21 @@ export async function pollApprovalVisible(
     expect(found).toBe(true)
   }).toPass({ timeout: options?.timeout ?? 30_000, intervals: [1_000] })
 }
+
+/**
+ * Poll the form prompts API until a pending prompt with the given name is listed.
+ * Use after `pollExecutionStatus` reaches "paused" on real backends when Temporal is available.
+ */
+export async function pollFormPromptVisible(
+  app: Page,
+  promptName: string,
+  options?: { token?: string; timeout?: number }
+): Promise<void> {
+  const token = options?.token ?? (await getAuthToken(app)) ?? undefined
+  await expect(async () => {
+    const resp = await apiRequest(app, 'get', '/form_prompts?status=pending&limit=100', { token })
+    const body = (await resp.json()) as { resources?: Array<{ name: string }> }
+    const found = body.resources?.some((r) => r.name === promptName)
+    expect(found).toBe(true)
+  }).toPass({ timeout: options?.timeout ?? 45_000, intervals: [1_000] })
+}

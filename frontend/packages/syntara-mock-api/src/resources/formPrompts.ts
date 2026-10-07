@@ -142,4 +142,28 @@ export const formPrompts: FormPromptRead[] = [
     responded_at: null,
     responded_by: null,
   },
+  ...Array.from({ length: 8 }, (_, index) => {
+    const n = index + 1
+    return {
+      id: `fp-pagination-seed-${n}`,
+      created_at: mockDate.minutesAgo10,
+      updated_at: mockDate.minutesAgo10,
+      labels: {},
+      project_id: 'p-001',
+      execution_id: 'exec-form-prompt',
+      prompt_node_id: `pagination_prompt_${n}`,
+      name: `Pagination seed prompt ${String(n).padStart(2, '0')}`,
+      message: `Pagination E2E seed row ${n}.`,
+      status: 'pending' as const,
+      timeout_at: mockDate.hoursFromNow23,
+      form_definition: sampleFormDefinition,
+      submit_label: 'Submit response',
+      success_message: 'Thank you — the workflow will continue.',
+      responder_users: [{ id: 'user-admin', username: 'admin' }],
+      responder_groups: [],
+      response_data: null,
+      responded_at: null,
+      responded_by: null,
+    }
+  }),
 ]
